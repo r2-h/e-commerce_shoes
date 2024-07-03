@@ -1,3 +1,8 @@
+import { ReactNode } from "react"
+
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { CircleUser, MenuIcon } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,13 +11,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { CircleUser, MenuIcon } from "lucide-react"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
+import { redirect } from "next/navigation"
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components"
+import { unstable_noStore as noStore } from "next/cache"
 import { DashboardNavigation } from "./_components/DashboardNavigation"
-import { Button } from "@/components/ui/button"
-import { ReactNode } from "react"
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  noStore()
+  const { getUser } = getKindeServerSession()
+  const user = await getUser()
+
+  if (!user || user.email !== "hareksian23@gmail.com") {
+    return redirect("/")
+  }
   return (
     <div className="flex w-full flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <header className="sticky top-0 flex h-16 items-center justify-between gap-4 border-b bg-white">
@@ -43,7 +55,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <button>Logout</button>
+              <LogoutLink>Logout</LogoutLink>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
