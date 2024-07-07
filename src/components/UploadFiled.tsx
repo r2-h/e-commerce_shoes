@@ -8,12 +8,10 @@ import { Download, DownloadIcon, Image as ImageIcon } from "lucide-react"
 type Props = {
   className?: string
   error?: string
-  images2: any
   setImages2: (images2: any[]) => void
-  handleDelete2: (index: number) => void
 }
 
-export const UploadField = ({ className, handleDelete2, images2, setImages2, error }: Props) => {
+export const UploadField = ({ className, setImages2, error }: Props) => {
   const { toast } = useToast()
   const [isDragOver, setIsDragOver] = useState(false)
   const isPending = false

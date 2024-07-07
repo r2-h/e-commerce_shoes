@@ -9,13 +9,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import prisma from "@/lib/db"
 import { MoreHorizontal, PlusCircle } from "lucide-react"
 import { unstable_noStore as noStore } from "next/cache"
 import Image from "next/image"
 import Link from "next/link"
 
+const getProducts = async () => {
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
+  return products
+}
+
 export default async function ProductsRoute() {
   noStore()
+  const products = await getProducts()
 
   return (
     <>
@@ -45,40 +56,42 @@ export default async function ProductsRoute() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>
-                  <Image
-                    alt="Product Image"
-                    src={""}
-                    height={64}
-                    width={64}
-                    className="rounded-md object-cover h-16 w-16"
-                  />
-                </TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>status</TableCell>
-                <TableCell>$2324</TableCell>
-                <TableCell>{new Intl.DateTimeFormat("en-US").format(1999)}</TableCell>
-                <TableCell className="text-end">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/products/${3}`}>Edit</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/products/${3}/delete`}>Delete</Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+              {products.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <Image
+                      alt="Product Image"
+                      src={product.images[0]}
+                      height={64}
+                      width={64}
+                      className="rounded-md object-cover h-16 w-16"
+                    />
+                  </TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.status}</TableCell>
+                  <TableCell>${product.price}</TableCell>
+                  <TableCell>{new Intl.DateTimeFormat("ru-RU").format(product.createdAt)}</TableCell>
+                  <TableCell className="text-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="icon" variant="ghost">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>  
+                          <Link href={`/dashboard/products/${product.id}`}>Edit</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/products/${product.id}/delete`}>Delete</Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </CardContent>

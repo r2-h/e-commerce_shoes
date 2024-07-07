@@ -6,7 +6,6 @@ export const productSchema = z.object({
   status: z.enum(["draft", "published", "archived"]),
   price: z.number().min(1),
   images: z.array(z.string()).min(1, "At least one image is required"),
-//   images2: z.array(z.string()).min(1, "At least one image is required"),
   category: z.enum(["men", "women", "kids"]),
   isFeatured: z.boolean().optional(),
 })

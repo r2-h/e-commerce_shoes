@@ -1,36 +1,48 @@
 "use client"
-import { createProduct } from "@/app/actions"
-import { SubmitButton } from "@/components/SubmitButtons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { ChevronLeft, XIcon } from "lucide-react"
+import Link from "next/link"
 import { CATEGORIES, STATUSES } from "@/lib/constants"
-import { UploadDropzone } from "@/lib/uploadthings"
-import { productSchema } from "@/lib/zodSchema"
+import { Switch } from "@/components/ui/switch"
+import Image from "next/image"
+import { editProduct } from "@/app/actions"
 import { useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
-import { ChevronLeft, XIcon } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
 import { useState } from "react"
 import { useFormState } from "react-dom"
+import { SubmitButton } from "@/components/SubmitButtons"
+import { UploadDropzone } from "@/lib/uploadthings"
+import { productSchema } from "@/lib/zodSchema"
+import { type $Enums } from "@prisma/client"
 
-export default function ProductCreatePage() {
-  const [lastResult, action] = useFormState(createProduct, undefined)
-  const [images, setImages] = useState<string[]>([])
+interface Props {
+  data: {
+    id: string
+    name: string
+    description: string
+    status: $Enums.ProductStatus
+    price: number
+    images: string[]
+    category: $Enums.Category
+    isFeatured: boolean
+  }
+}
 
-  const { toast } = useToast()
-
+export function EditForm({ data }: Props) {
+  const [images, setImages] = useState<string[]>(data.images)
+  const [lastResult, action] = useFormState(editProduct, undefined)
   const [form, fields] = useForm({
     lastResult,
+
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: productSchema })
     },
+
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   })
@@ -38,22 +50,21 @@ export default function ProductCreatePage() {
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index))
   }
-
   return (
-    <form id={form.id} action={action} onSubmit={form.onSubmit}>
+    <form id={form.id} onSubmit={form.onSubmit} action={action}>
+      <input type="hidden" name="productId" value={data.id} /> {/* передать в action id по которому будем изменять продукт*/}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/products">
             <ChevronLeft className="w-4 h-4" />
           </Link>
         </Button>
-        <h1 className="text-xl font-semibold tracking-tight">New Product</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Edit Product</h1>
       </div>
-
       <Card className="mt-5">
         <CardHeader>
           <CardTitle>Product Details</CardTitle>
-          <CardDescription>In this form you can create your product</CardDescription>
+          <CardDescription>In this form you can update your product</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
@@ -61,57 +72,57 @@ export default function ProductCreatePage() {
               <Label>Name</Label>
               <Input
                 type="text"
+                key={fields.name.key}
+                name={fields.name.name}
+                defaultValue={data.name}
                 className="w-full"
                 placeholder="Product Name"
-                key={fields.name.name}
-                name={fields.name.name}
-                defaultValue={fields.name.initialValue}
               />
+
               <p className="text-red-500">{fields.name.errors}</p>
             </div>
+
             <div className="flex flex-col gap-3">
               <Label>Description</Label>
               <Textarea
-                placeholder="Write your description right here..."
-                key={fields.description.name}
+                key={fields.description.key}
                 name={fields.description.name}
-                defaultValue={fields.description.initialValue}
+                defaultValue={data.description}
+                placeholder="Write your description right here..."
               />
               <p className="text-red-500">{fields.description.errors}</p>
             </div>
             <div className="flex flex-col gap-3">
               <Label>Price</Label>
               <Input
+                key={fields.price.key}
+                name={fields.price.name}
+                defaultValue={data.price}
                 type="number"
                 placeholder="$55"
-                key={fields.price.name}
-                name={fields.price.name}
-                defaultValue={fields.price.initialValue}
               />
               <p className="text-red-500">{fields.price.errors}</p>
             </div>
+
             <div className="flex flex-col gap-3">
               <Label>Featured Product</Label>
               <Switch
-                key={fields.isFeatured.name}
+                key={fields.isFeatured.key}
                 name={fields.isFeatured.name}
-                defaultValue={fields.isFeatured.initialValue}
+                defaultChecked={data.isFeatured}
               />
+              <p className="text-red-500">{fields.isFeatured.errors}</p>
             </div>
+
             <div className="flex flex-col gap-3">
               <Label>Status</Label>
-              <Select
-                onValueChange={() => form.validate({ name: fields.status.name })}
-                key={fields.status.key}
-                name={fields.status.name}
-                defaultValue={fields.status.initialValue}
-              >
+              <Select key={fields.status.key} name={fields.status.name} defaultValue={data.status}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
                 <SelectContent>
                   {STATUSES.map((status) => (
-                    <SelectItem key={status.id} value={status.name}>
+                    <SelectItem value={status.name} key={status.id}>
                       {status.title}
                     </SelectItem>
                   ))}
@@ -122,12 +133,7 @@ export default function ProductCreatePage() {
 
             <div className="flex flex-col gap-3">
               <Label>Category</Label>
-              <Select
-                onValueChange={() => form.validate({ name: fields.category.name })}
-                key={fields.category.key}
-                name={fields.category.name}
-                defaultValue={fields.category.initialValue}
-              >
+              <Select key={fields.category.key} name={fields.category.name} defaultValue={data.category}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
@@ -146,7 +152,6 @@ export default function ProductCreatePage() {
               <Label>Images</Label>
               <input
                 type="hidden"
-                onChange={() => form.validate({ name: fields.images.name })}
                 value={images}
                 key={fields.images.key}
                 name={fields.images.name}
@@ -163,6 +168,7 @@ export default function ProductCreatePage() {
                         alt="Product Image"
                         className="w-full h-full object-cover rounded-lg border"
                       />
+
                       <button
                         onClick={() => handleDelete(index)}
                         type="button"
@@ -176,16 +182,11 @@ export default function ProductCreatePage() {
               ) : (
                 <UploadDropzone
                   endpoint="imageUploader"
-                  className="cursor-pointer"
                   onClientUploadComplete={(res) => {
                     setImages(res.map((r) => r.url))
                   }}
                   onUploadError={() => {
-                    toast({
-                      title: "Error",
-                      description: "Something went wrong",
-                      variant: "destructive",
-                    })
+                    alert("Something went wrong")
                   }}
                 />
               )}
@@ -194,7 +195,7 @@ export default function ProductCreatePage() {
           </div>
         </CardContent>
         <CardFooter>
-          <SubmitButton text="Create Product" />
+          <SubmitButton text="Edit Product" />
         </CardFooter>
       </Card>
     </form>
