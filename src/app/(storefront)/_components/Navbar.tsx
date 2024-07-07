@@ -8,7 +8,7 @@ import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components
 import { NavbarLinks } from "./NavbarLinks"
 import { UserDropdown } from "./UserDropdown"
 
-export async function Navbar() {
+export async function Navbar() { 
   const { getUser } = getKindeServerSession()
   const user = await getUser()
 
