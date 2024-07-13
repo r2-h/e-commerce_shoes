@@ -1,7 +1,7 @@
-import { LoadingProductCard, ProductCard } from "./ProductCard"
-import { Suspense } from "react"
-import { unstable_noStore as noStore } from "next/cache"
 import prisma from "@/lib/db"
+import { unstable_noStore as noStore } from "next/cache"
+import { Suspense } from "react"
+import { ProductCard } from "./ProductCard"
 
 async function getData() {
   const data = await prisma.product.findMany({

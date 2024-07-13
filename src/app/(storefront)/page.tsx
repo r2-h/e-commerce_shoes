@@ -4,10 +4,10 @@ import { Hero } from "./_components/Hero"
 
 export default function HomePage() {
   return (
-    <div className="mb-10">
+    <>
       <Hero />
       <CategoriesSelection />
       <FeaturedProducts />
-    </div>
+    </>
   )
 }

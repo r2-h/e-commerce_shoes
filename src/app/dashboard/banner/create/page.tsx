@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useToast } from "@/components/ui/use-toast"
 import { UploadDropzone } from "@/lib/uploadthings"
 import { bannerSchema } from "@/lib/zodSchema"
 import { useForm } from "@conform-to/react"
@@ -16,16 +17,15 @@ import { useState } from "react"
 import { useFormState } from "react-dom"
 
 export default function BannerRoute() {
+  const { toast } = useToast()
   const [image, setImages] = useState<string | undefined>(undefined)
   const [lastResult, action] = useFormState(createBanner, undefined)
 
   const [form, fields] = useForm({
     lastResult,
-
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: bannerSchema })
     },
-
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   })
@@ -83,7 +83,11 @@ export default function BannerRoute() {
                     setImages(res[0].url)
                   }}
                   onUploadError={() => {
-                    alert("Something went wrong")
+                    toast({
+                      title: err.message,
+                      description: "Something went wrong",
+                      variant: "destructive",
+                    })
                   }}
                   endpoint="bannerImageRoute"
                 />

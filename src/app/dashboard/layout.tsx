@@ -1,8 +1,5 @@
 import { ReactNode } from "react"
-
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { CircleUser, MenuIcon } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
-import { redirect } from "next/navigation"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components"
+import { CircleUser, MenuIcon } from "lucide-react"
 import { unstable_noStore as noStore } from "next/cache"
+import Link from "next/link"
 import { DashboardNavigation } from "./_components/DashboardNavigation"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   noStore()
@@ -52,8 +51,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <LogoutLink>Logout</LogoutLink>
+              <Link href="/">Storefront</Link>
             </DropdownMenuItem>
+            {user && (
+              <DropdownMenuItem asChild>
+                <LogoutLink>Logout</LogoutLink>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </header>

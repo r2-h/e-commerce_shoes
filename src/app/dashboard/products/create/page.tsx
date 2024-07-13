@@ -180,9 +180,9 @@ export default function ProductCreatePage() {
                   onClientUploadComplete={(res) => {
                     setImages(res.map((r) => r.url))
                   }}
-                  onUploadError={() => {
+                  onUploadError={(err) => {
                     toast({
-                      title: "Error",
+                      title: err.message,
                       description: "Something went wrong",
                       variant: "destructive",
                     })

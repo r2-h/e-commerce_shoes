@@ -21,7 +21,9 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
+    "@radix-ui/react-tooltip": "^1.1.2",
     "@uploadthing/react": "^6.7.2",
+    "@upstash/redis": "^1.32.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.1.6",
@@ -33,7 +35,8 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^6.13.2",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",

@@ -27,23 +27,7 @@ export function SubmitButton({ text, variant }: buttonProps) {
   )
 }
 
-export function ShoppingBagButton() {
-  const { pending } = useFormStatus()
 
-  return (
-    <>
-      {pending ? (
-        <Button disabled size="lg" className="w-full mt-5">
-          <Loader2 className="mr-4 h-5 w-5 animate-spin" /> Please Wait
-        </Button>
-      ) : (
-        <Button size="lg" className="w-full mt-5" type="submit">
-          <ShoppingBag className="mr-4 h-5 w-5" /> Add to Cart
-        </Button>
-      )}
-    </>
-  )
-}
 
 export function DeleteItem() {
   const { pending } = useFormStatus()

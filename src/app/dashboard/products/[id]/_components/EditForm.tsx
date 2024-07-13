@@ -1,24 +1,25 @@
 "use client"
+import { editProduct } from "@/app/actions"
+import { SubmitButton } from "@/components/SubmitButtons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { ChevronLeft, XIcon } from "lucide-react"
-import Link from "next/link"
-import { CATEGORIES, STATUSES } from "@/lib/constants"
 import { Switch } from "@/components/ui/switch"
-import Image from "next/image"
-import { editProduct } from "@/app/actions"
-import { useForm } from "@conform-to/react"
-import { parseWithZod } from "@conform-to/zod"
-import { useState } from "react"
-import { useFormState } from "react-dom"
-import { SubmitButton } from "@/components/SubmitButtons"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/components/ui/use-toast"
+import { CATEGORIES, STATUSES } from "@/lib/constants"
 import { UploadDropzone } from "@/lib/uploadthings"
 import { productSchema } from "@/lib/zodSchema"
+import { useForm } from "@conform-to/react"
+import { parseWithZod } from "@conform-to/zod"
 import { type $Enums } from "@prisma/client"
+import { ChevronLeft, XIcon } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useState } from "react"
+import { useFormState } from "react-dom"
 
 interface Props {
   data: {
@@ -34,11 +35,11 @@ interface Props {
 }
 
 export function EditForm({ data }: Props) {
+  const { toast } = useToast()
   const [images, setImages] = useState<string[]>(data.images)
   const [lastResult, action] = useFormState(editProduct, undefined)
   const [form, fields] = useForm({
     lastResult,
-
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: productSchema })
     },
@@ -52,7 +53,8 @@ export function EditForm({ data }: Props) {
   }
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
-      <input type="hidden" name="productId" value={data.id} /> {/* передать в action id по которому будем изменять продукт*/}
+      <input type="hidden" name="productId" value={data.id} />{" "}
+      {/* передать в action id по которому будем изменять продукт*/}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/products">
@@ -185,8 +187,12 @@ export function EditForm({ data }: Props) {
                   onClientUploadComplete={(res) => {
                     setImages(res.map((r) => r.url))
                   }}
-                  onUploadError={() => {
-                    alert("Something went wrong")
+                  onUploadError={(err) => {
+                    toast({
+                      title: err.message,
+                      description: "Something went wrong",
+                      variant: "destructive",
+                    })
                   }}
                 />
               )}

@@ -1,3 +1,4 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 interface iAppProps {
   email: string
@@ -17,6 +20,8 @@ interface iAppProps {
 }
 
 export function UserDropdown({ email, name, userImage }: iAppProps) {
+  const pathname = usePathname()
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,6 +38,9 @@ export function UserDropdown({ email, name, userImage }: iAppProps) {
           <p className="text-xs leading-none text-muted-foreground">{email}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard">Dashboard</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <LogoutLink>Log out</LogoutLink>
         </DropdownMenuItem>
