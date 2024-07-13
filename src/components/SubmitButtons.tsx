@@ -27,21 +27,19 @@ export function SubmitButton({ text, variant }: buttonProps) {
   )
 }
 
-
-
 export function DeleteItem() {
   const { pending } = useFormStatus()
 
   return (
     <>
       {pending ? (
-        <button disabled className="font-medium text-primary text-end">
+        <Button variant="ghost" disabled className="font-medium text-primary text-end">
           Removing...
-        </button>
+        </Button>
       ) : (
-        <button type="submit" className="font-medium text-primary text-end">
+        <Button variant="ghost" type="submit" className="font-medium text-primary text-end">
           Delete
-        </button>
+        </Button>
       )}
     </>
   )
