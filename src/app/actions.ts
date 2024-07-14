@@ -7,6 +7,8 @@ import { parseWithZod } from "@conform-to/zod"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { stripe } from "@/lib/stripe"
+import Stripe from "stripe"
 
 export async function createProduct(prevState: unknown, formData: FormData) {
   const { getUser } = getKindeServerSession()
@@ -48,7 +50,7 @@ export async function editProduct(prevState: unknown, formData: FormData) {
   const user = await getUser()
 
   if (user?.email !== "hareksian23@gmail.com") {
-    return redirect("/")
+    return { status: "error", payload: {}, error: { form: ["only the owner can change the data"] } }
   }
 
   const submission = parseWithZod(formData, {
@@ -213,25 +215,68 @@ export async function addItem(productId: string) {
 }
 
 export async function deleteItem(formData: FormData) {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
+  const { getUser } = getKindeServerSession()
+  const user = await getUser()
 
   if (!user) {
-    return redirect("/");
+    return redirect("/")
   }
 
-  const productId = formData.get("productId");
+  const productId = formData.get("productId")
 
-  let cart: Cart | null = await redis.get(`cart-${user.id}`);
+  let cart: Cart | null = await redis.get(`cart-${user.id}`)
 
   if (cart && cart.items) {
     const updateCart: Cart = {
       userId: user.id,
       items: cart.items.filter((item) => item.id !== productId),
-    };
+    }
 
-    await redis.set(`cart-${user.id}`, updateCart);
+    await redis.set(`cart-${user.id}`, updateCart)
   }
 
-  revalidatePath("/bag");
+  revalidatePath("/bag")
+}
+
+export async function checkOut() {
+  const { getUser } = getKindeServerSession()
+  const user = await getUser()
+
+  if (!user) {
+    return redirect("/")
+  }
+
+  let cart: Cart | null = await redis.get(`cart-${user.id}`)
+
+  if (cart && cart.items) {
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = cart.items.map((item) => ({
+      price_data: {
+        currency: "usd",
+        unit_amount: item.price * 100,
+        product_data: {
+          name: item.name,
+          images: [item.imageString],
+        },
+      },
+      quantity: item.quantity,
+    }))
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: lineItems,
+      success_url:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000/payment/success"
+          : "https://shoe-marshal.vercel.app/payment/success....................",
+      cancel_url:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000/payment/cancel"
+          : "https://shoe-marshal.vercel.app/payment/cancel.................",
+      metadata: {
+        userId: user.id,
+      },
+    })
+
+    return redirect(session.url as string)
+  }
 }

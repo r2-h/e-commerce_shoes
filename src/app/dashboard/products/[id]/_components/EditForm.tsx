@@ -12,13 +12,13 @@ import { useToast } from "@/components/ui/use-toast"
 import { CATEGORIES, STATUSES } from "@/lib/constants"
 import { UploadDropzone } from "@/lib/uploadthings"
 import { productSchema } from "@/lib/zodSchema"
-import { useForm } from "@conform-to/react"
+import { SubmissionResult, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { type $Enums } from "@prisma/client"
 import { ChevronLeft, XIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFormState } from "react-dom"
 
 interface Props {
@@ -39,11 +39,10 @@ export function EditForm({ data }: Props) {
   const [images, setImages] = useState<string[]>(data.images)
   const [lastResult, action] = useFormState(editProduct, undefined)
   const [form, fields] = useForm({
-    lastResult,
+    lastResult: lastResult as SubmissionResult<string[]>,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: productSchema })
     },
-
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   })
@@ -51,9 +50,19 @@ export function EditForm({ data }: Props) {
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index))
   }
+  useEffect(() => {
+    if (lastResult?.status === "error" && lastResult?.error?.form) {
+      toast({
+        title: "Error",
+        description: lastResult.error.form.join(", "),
+        variant: "destructive",
+      })
+    }
+  }, [lastResult, toast])
+
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
-      <input type="hidden" name="productId" value={data.id} />{" "}
+      <input type="hidden" name="productId" value={data.id} />
       {/* передать в action id по которому будем изменять продукт*/}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="icon" asChild>

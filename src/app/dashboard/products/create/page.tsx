@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { CATEGORIES, STATUSES } from "@/lib/constants"
 import { UploadDropzone } from "@/lib/uploadthings"
 import { productSchema } from "@/lib/zodSchema"
-import { useForm } from "@conform-to/react"
+import { SubmissionResult, useForm } from "@conform-to/react"
 import { parseWithZod } from "@conform-to/zod"
 import { ChevronLeft, XIcon } from "lucide-react"
 import Image from "next/image"
@@ -27,7 +27,7 @@ export default function ProductCreatePage() {
   const { toast } = useToast()
 
   const [form, fields] = useForm({
-    lastResult,
+    lastResult: lastResult  as SubmissionResult<string[]>,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: productSchema })
     },

@@ -8,7 +8,7 @@ import { redirect } from "next/navigation"
 import { Cart } from "@/lib/types"
 import { redis } from "@/lib/redis"
 import { ChceckoutButton, DeleteItem } from "@/components/SubmitButtons"
-import { deleteItem } from "@/app/actions"
+import { checkOut, deleteItem } from "@/app/actions"
 
 export default async function BagRoute() {
   noStore()
@@ -74,7 +74,7 @@ export default async function BagRoute() {
               <p>Subtotal:</p>
               <p>${new Intl.NumberFormat("en-US").format(getTotalPrice())}</p>
             </div>
-            <form>
+            <form action={checkOut}>
               <ChceckoutButton />
             </form>
           </div>

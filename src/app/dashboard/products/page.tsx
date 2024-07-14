@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import prisma from "@/lib/db"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 import { MoreHorizontal, PlusCircle } from "lucide-react"
 import { unstable_noStore as noStore } from "next/cache"
 import Image from "next/image"
@@ -26,6 +27,9 @@ const getProducts = async () => {
 
 export default async function ProductsRoute() {
   noStore()
+  const { getUser } = getKindeServerSession()
+  const user = await getUser()
+  const owner = user?.email === "hareksian23@gmail.com"
   const products = await getProducts()
 
   return (
@@ -81,10 +85,10 @@ export default async function ProductsRoute() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>  
+                        <DropdownMenuItem asChild>
                           <Link href={`/dashboard/products/${product.id}`}>Edit</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild disabled={!owner}>
                           <Link href={`/dashboard/products/${product.id}/delete`}>Delete</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

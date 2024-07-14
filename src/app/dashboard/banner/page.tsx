@@ -14,6 +14,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { unstable_noStore as noStore } from "next/cache"
 import prisma from "@/lib/db"
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
 
 async function getData() {
   const data = await prisma.banner.findMany({
@@ -27,6 +28,9 @@ async function getData() {
 
 export default async function BannerPage() {
   noStore()
+  const { getUser } = getKindeServerSession()
+  const user = await getUser()
+  const owner = user?.email === "hareksian23@gmail.com"
   const data = await getData()
   return (
     <>
@@ -78,7 +82,7 @@ export default async function BannerPage() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem asChild disabled={!owner}>
                           <Link href={`/dashboard/banner/${item.id}/delete`}>Delete</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

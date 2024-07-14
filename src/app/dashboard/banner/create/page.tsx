@@ -82,7 +82,7 @@ export default function BannerRoute() {
                   onClientUploadComplete={(res) => {
                     setImages(res[0].url)
                   }}
-                  onUploadError={() => {
+                  onUploadError={(err) => {
                     toast({
                       title: err.message,
                       description: "Something went wrong",

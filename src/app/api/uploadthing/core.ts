@@ -10,7 +10,7 @@ export const ourFileRouter = {
       const { getUser } = getKindeServerSession()
       const user = await getUser()
 
-      if (!user || user.email !== "hareksian23@gmail.com") throw new UploadThingError("Unauthorized")
+      if (!user || user.email !== "hareksian23@gmail.com") throw new UploadThingError("You are not the owner")
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: user.id }
@@ -27,7 +27,7 @@ export const ourFileRouter = {
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession()
       const user = await getUser()
-      if (!user || user.email !== "hareksian23@gmail.com") throw new UploadThingError("Unauthorized")
+      if (!user || user.email !== "hareksian23@gmail.com") throw new UploadThingError("You are not the owner")
       return { userId: user.id }
     })
     .onUploadComplete(async ({ metadata, file }) => {
