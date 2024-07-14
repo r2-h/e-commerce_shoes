@@ -7,8 +7,10 @@ import { NavbarLinks } from "./NavbarLinks"
 import { UserDropdown } from "./UserDropdown"
 import { redis } from "@/lib/redis"
 import { Cart } from "@/lib/types"
+import { unstable_noStore as noStore } from "next/cache"
 
 export async function Navbar() {
+  noStore()
   const { getUser } = getKindeServerSession()
   const user = await getUser()
 
