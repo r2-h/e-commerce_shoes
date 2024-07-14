@@ -8,6 +8,7 @@ import { redirect } from "next/navigation"
 import { Cart } from "@/lib/types"
 import { redis } from "@/lib/redis"
 import { ChceckoutButton, DeleteItem } from "@/components/SubmitButtons"
+import { deleteItem } from "@/app/actions"
 
 export default async function BagRoute() {
   noStore()
@@ -29,7 +30,7 @@ export default async function BagRoute() {
 
   return (
     <div className="max-w-2xl mx-auto mt-10 min-h-[55vh]">
-      {!cart ? (
+      {!cart?.items.length ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center mt-20">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
             <ShoppingBag className="w-10 h-10 text-primary" />
@@ -54,13 +55,13 @@ export default async function BagRoute() {
               </div>
               <div className="ml-5 flex justify-between w-full font-medium">
                 <p>{item.name}</p>
-                <div className="flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-x-2">
+                <div className="flex flex-col h-full justify-between ">
+                  <div className="flex items-center gap-x-2 justify-end">
                     <p>{item.quantity} x</p>
                     <p>${item.price}</p>
                   </div>
 
-                  <form className="text-end">
+                  <form className="text-end" action={deleteItem}>
                     <input type="hidden" name="productId" value={item.id} />
                     <DeleteItem />
                   </form>
