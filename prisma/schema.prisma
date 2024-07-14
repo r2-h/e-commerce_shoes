@@ -15,6 +15,7 @@ model User {
   profileImage String
 
   createdAt DateTime @default(now())
+  Order     Order[]
 }
 
 enum ProductStatus {
@@ -49,3 +50,15 @@ model Banner {
 
   createdAt DateTime @default(now())
 }
+
+model Order {
+  id     String @id @default(uuid())
+  status String @default("pending")
+  amount Int
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  createdAt DateTime @default(now())
+}
+  
